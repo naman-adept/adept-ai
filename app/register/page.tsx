@@ -1,22 +1,13 @@
-import Link from 'next/link';
-import { Form } from 'app/form';
-import { redirect } from 'next/navigation';
-import { createUser, getUser } from 'app/db';
-import { SubmitButton } from 'app/submit-button';
+"use client";
 
-export default function Login() {
-  async function register(formData: FormData) {
-    'use server';
-    let email = formData.get('email') as string;
-    let password = formData.get('password') as string;
-    let user = await getUser(email);
+import Link from "next/link";
+import { handleRegister } from "./actions";
 
-    if (user.length > 0) {
-      return 'User already exists'; // TODO: Handle errors with useFormStatus
-    } else {
-      await createUser(email, password);
-      redirect('/login');
-    }
+export default function Register() {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    await handleRegister(formData);
   }
 
   return (
@@ -28,16 +19,56 @@ export default function Login() {
             Create an account with your email and password
           </p>
         </div>
-        <Form action={register}>
-          <SubmitButton>Sign Up</SubmitButton>
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16"
+        >
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-xs text-gray-600 uppercase"
+            >
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="user@acme.com"
+              autoComplete="email"
+              required
+              className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-xs text-gray-600 uppercase"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 focus:outline-none"
+          >
+            Sign Up
+          </button>
           <p className="text-center text-sm text-gray-600">
-            {'Already have an account? '}
+            {"Already have an account? "}
             <Link href="/login" className="font-semibold text-gray-800">
               Sign in
             </Link>
-            {' instead.'}
+            {" instead."}
           </p>
-        </Form>
+        </form>
       </div>
     </div>
   );

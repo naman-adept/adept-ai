@@ -1,9 +1,15 @@
-import Link from 'next/link';
-import { Form } from 'app/form';
-import { signIn } from 'app/auth';
-import { SubmitButton } from 'app/submit-button';
+"use client";
+
+import Link from "next/link";
+import { handleLogin } from "./actions";
 
 export default function Login() {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    await handleLogin(formData);
+  }
+
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
       <div className="z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
@@ -13,25 +19,56 @@ export default function Login() {
             Use your email and password to sign in
           </p>
         </div>
-        <Form
-          action={async (formData: FormData) => {
-            'use server';
-            await signIn('credentials', {
-              redirectTo: '/protected',
-              email: formData.get('email') as string,
-              password: formData.get('password') as string,
-            });
-          }}
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16"
         >
-          <SubmitButton>Sign in</SubmitButton>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-xs text-gray-600 uppercase"
+            >
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="user@acme.com"
+              autoComplete="email"
+              required
+              className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-xs text-gray-600 uppercase"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none"
+          >
+            Sign in
+          </button>
           <p className="text-center text-sm text-gray-600">
             {"Don't have an account? "}
             <Link href="/register" className="font-semibold text-gray-800">
               Sign up
             </Link>
-            {' for free.'}
+            {" for free."}
           </p>
-        </Form>
+        </form>
       </div>
     </div>
   );
